@@ -52,8 +52,6 @@ static void** g_methodsTable = nullptr;
 
 Status init(const RenderType renderType)
 {
-    using ComPtr = Microsoft::WRL::ComPtr;
-
     if(g_renderType != RenderType::None)
     {
         return Status::AlreadyInitializedError;
@@ -92,6 +90,8 @@ Status init(const RenderType renderType)
                 windowClass.hInstance,
                 nullptr
             );
+
+            using Microsoft::WRL::ComPtr;
 
             if(renderType == RenderType::D3D9)
             {
@@ -158,7 +158,7 @@ Status init(const RenderType renderType)
                 }
 
                 g_methodsTable = new(::std::nothrow) void* [119];
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable), *reinterpret_cast<void**>(device), 119 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable), *reinterpret_cast<void**>(device.Get()), 119 * sizeof(void*));
 
 #if KIERO_USE_MINHOOK
                 MH_Initialize();
@@ -258,7 +258,7 @@ Status init(const RenderType renderType)
                 ComPtr<ID3D10Device> device;
                 ComPtr<IDXGISwapChain> swapChain;
                 status = D3D10CreateDeviceAndSwapChain(
-                    adapter,
+                    adapter.Get(),
                     D3D10_DRIVER_TYPE_HARDWARE,
                     nullptr,
                     0,
@@ -280,8 +280,8 @@ Status init(const RenderType renderType)
                 }
 
                 g_methodsTable = new(::std::nothrow) void* [116];
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable), *reinterpret_cast<void**>(swapChain), 18 * sizeof(void*));
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 18), *reinterpret_cast<void**>(device), 98 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable), *reinterpret_cast<void**>(swapChain.Get()), 18 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 18), *reinterpret_cast<void**>(device.Get()), 98 * sizeof(void*));
 
 #if KIERO_USE_MINHOOK
                 MH_Initialize();
@@ -379,9 +379,9 @@ Status init(const RenderType renderType)
                 }
 
                 g_methodsTable = new(::std::nothrow) void* [205];
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable), *reinterpret_cast<void**>(swapChain), 18 * sizeof(void*));
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 18), *reinterpret_cast<void**>(device), 43 * sizeof(void*));
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 18 + 43), *reinterpret_cast<void**>(context), 144 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable), *reinterpret_cast<void**>(swapChain.Get()), 18 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 18), *reinterpret_cast<void**>(device.Get()), 43 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 18 + 43), *reinterpret_cast<void**>(context.Get()), 144 * sizeof(void*));
 
 #if KIERO_USE_MINHOOK
                 MH_Initialize();
@@ -456,7 +456,7 @@ Status init(const RenderType renderType)
 
                 ComPtr<ID3D12Device> device;
                 status = D3D12CreateDevice(
-                    adapter,
+                    adapter.Get(),
                     D3D_FEATURE_LEVEL_11_0,
                     IID_PPV_ARGS(&device)
                 );
@@ -512,7 +512,7 @@ Status init(const RenderType renderType)
                 status = device->CreateCommandList(
                     0,
                     D3D12_COMMAND_LIST_TYPE_DIRECT,
-                    commandAllocator,
+                    commandAllocator.Get(),
                     nullptr,
                     IID_PPV_ARGS(&commandList)
                 );
@@ -556,7 +556,7 @@ Status init(const RenderType renderType)
 
                 ComPtr<IDXGISwapChain> swapChain;
                 status = factory->CreateSwapChain(
-                    commandQueue,
+                    commandQueue.Get(),
                     &swapChainDesc,
                     &swapChain
                 );
@@ -574,11 +574,11 @@ Status init(const RenderType renderType)
                 }
 
                 g_methodsTable = new(::std::nothrow) void* [150];
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable), *static_cast<void**>(device), 44 * sizeof(void*));
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 44), *static_cast<void**>(commandQueue), 19 * sizeof(void*));
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 44 + 19), *static_cast<void**>(commandAllocator), 9 * sizeof(void*));
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 44 + 19 + 9), *static_cast<void**>(commandList), 60 * sizeof(void*));
-                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 44 + 19 + 9 + 60), *static_cast<void**>(swapChain), 18 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable), *reinterpret_cast<void**>(device.Get()), 44 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 44), *reinterpret_cast<void**>(commandQueue.Get()), 19 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 44 + 19), *reinterpret_cast<void**>(commandAllocator.Get()), 9 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 44 + 19 + 9), *reinterpret_cast<void**>(commandList.Get()), 60 * sizeof(void*));
+                (void) ::std::memcpy(static_cast<void*>(g_methodsTable + 44 + 19 + 9 + 60), *reinterpret_cast<void**>(swapChain.Get()), 18 * sizeof(void*));
 
 #if KIERO_USE_MINHOOK
                 MH_Initialize();
