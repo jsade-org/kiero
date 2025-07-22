@@ -1,78 +1,72 @@
-#ifndef __KIERO_H__
-#define __KIERO_H__
+#pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
-#define KIERO_VERSION "1.2.12"
+#define KIERO_VERSION "1.3.0"
 
-#define KIERO_INCLUDE_D3D9   0 // 1 if you need D3D9 hook
-#define KIERO_INCLUDE_D3D10  0 // 1 if you need D3D10 hook
-#define KIERO_INCLUDE_D3D11  0 // 1 if you need D3D11 hook
-#define KIERO_INCLUDE_D3D12  0 // 1 if you need D3D12 hook
-#define KIERO_INCLUDE_OPENGL 0 // 1 if you need OpenGL hook
-#define KIERO_INCLUDE_VULKAN 0 // 1 if you need Vulkan hook
-#define KIERO_USE_MINHOOK    0 // 1 if you will use kiero::bind function
-
-#define KIERO_ARCH_X64 0
-#define KIERO_ARCH_X86 0
-
-#if defined(_M_X64)	
-# undef  KIERO_ARCH_X64
-# define KIERO_ARCH_X64 1
-#else
-# undef  KIERO_ARCH_X86
-# define KIERO_ARCH_X86 1
+#ifndef KIERO_INCLUDE_D3D9   
+    #define KIERO_INCLUDE_D3D9   0 // 1 if you need D3D9 hook
 #endif
 
-#if KIERO_ARCH_X64
-typedef uint64_t uint150_t;
-#else
-typedef uint32_t uint150_t;
+#ifndef KIERO_INCLUDE_D3D10
+    #define KIERO_INCLUDE_D3D10  0 // 1 if you need D3D10 hook
+#endif
+
+#ifndef KIERO_INCLUDE_D3D11
+    #define KIERO_INCLUDE_D3D11  0 // 1 if you need D3D11 hook
+#endif
+
+#ifndef KIERO_INCLUDE_D3D12
+    #define KIERO_INCLUDE_D3D12  0 // 1 if you need D3D12 hook
+#endif
+
+#ifndef KIERO_INCLUDE_OPENGL
+    #define KIERO_INCLUDE_OPENGL 0 // 1 if you need OpenGL hook
+#endif
+
+#ifndef KIERO_INCLUDE_VULKAN
+    #define KIERO_INCLUDE_VULKAN 0 // 1 if you need Vulkan hook
+#endif
+
+#ifndef KIERO_USE_MINHOOK
+    #define KIERO_USE_MINHOOK    0 // 1 if you will use kiero::bind function
 #endif
 
 namespace kiero
 {
-	struct Status
+	enum class Status
 	{
-		enum Enum
-		{
-			UnknownError = -1,
-			NotSupportedError = -2,
-			ModuleNotFoundError = -3,
+		UnknownError = -1,
+		NotSupportedError = -2,
+		ModuleNotFoundError = -3,
 
-			AlreadyInitializedError = -4,
-			NotInitializedError = -5,
+		AlreadyInitializedError = -4,
+		NotInitializedError = -5,
 
-			Success = 0,
-		};
+		Success = 0,
 	};
 
-	struct RenderType
+	enum class RenderType
 	{
-		enum Enum
-		{
-			None,
+		None,
 
-			D3D9,
-			D3D10,
-			D3D11,
-			D3D12,
+		D3D9,
+		D3D10,
+		D3D11,
+		D3D12,
 
-			OpenGL,
-			Vulkan,
+		OpenGL,
+		Vulkan,
 
-			Auto
-		};
+		Auto
 	};
 
-	Status::Enum init(RenderType::Enum renderType);
+	Status init(const RenderType renderType);
 	void shutdown();
 
-	Status::Enum bind(uint16_t index, void** original, void* function);
-	void unbind(uint16_t index);
+	Status bind(const ::std::uint16_t index, void** const original, void* const function);
+	void unbind(const ::std::uint16_t index);
 
-	RenderType::Enum getRenderType();
-	uint150_t* getMethodsTable();
+	[[nodiscard]] RenderType getRenderType() noexcept;
+	[[nodiscard]] void** getMethodsTable() noexcept;
 }
-
-#endif // __KIERO_H__
